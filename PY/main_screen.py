@@ -18,7 +18,7 @@ janela.geometry("400x300")
 janela.configure(bg="#f0f0f0")
 
 # Título
-titulo = tk.Label(janela, text="Adicione o titulo", font=("Helvetica", 16, "bold"), bg="#f0f0f0")
+titulo = tk.Label(janela, text="Adicionar Titulo do PIM", font=("Helvetica", 16, "bold"), bg="#f0f0f0")
 titulo.pack(pady=20)
 
 # Botão "Iniciar"
