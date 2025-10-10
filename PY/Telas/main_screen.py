@@ -24,9 +24,9 @@ titulo.pack(pady=20)
 campo_dados = tk.Text(janela, height=15, width=80, font=("Courier", 10))
 campo_dados.pack(pady=10)
 
-# Frame para alinhar os botões horizontalmente
+# Frame para alinhar os botões horizontalmente no canto inferior direito
 frame_botoes = tk.Frame(janela, bg="#f0f0f0")
-frame_botoes.pack(pady=10)
+frame_botoes.pack(side="bottom", anchor="e", padx=20, pady=20)
 
 # Botão "Iniciar"
 botao_iniciar = tk.Button(frame_botoes, text="Iniciar", font=("Helvetica", 12), bg="#4CAF50", fg="white", command=iniciar_app)
@@ -37,9 +37,9 @@ botao_sair = tk.Button(frame_botoes, text="Sair", font=("Helvetica", 12), bg="#f
 botao_sair.pack(side=tk.LEFT, padx=10)
 
 # Rodapé
-rodape = tk.Label(janela, text="© 2025 PIM II Inc.", font=("Helvetica", 10), bg="#f0f0f0")
-rodape.pack(side="bottom", pady=10)
-
+rodape = tk.Label(janela, text="© 2025 PIM II Inc.", font=("Helvetica", 8), bg="#f0f0f0")
+rodape.place(relx=0.5, rely=1.0, anchor="s")
+   
 # Loop da interface
 janela.mainloop()
 # Fim do código
