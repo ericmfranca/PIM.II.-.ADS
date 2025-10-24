@@ -1,7 +1,8 @@
 RA_Aluno,RA_Professor,Disciplina,Nota_Bimestre_1,Faltas_Bimestre_1,Nota_Bimestre_2,Faltas_Bimestre_2,Nota_Bimestre_3,Faltas_Bimestre_3,Nota_Bimestre_4,Faltas_Bimestre_4
-ALUN01,PROF01,Matematica,5.0,1,3.0,3,8.0,1,10.0,0
+ALUN01,PROF01,Matematica,1.0,11,1.0,12,2.0,24,1.0,21
 ALUN04,PROF02,Portugues,10.0,16,6.0,4,8.0,10,2.0,19
 ALUN05,PROF01,Matematica,8.4,1,6.5,2,5.5,5,9.4,1
 ALUN06,PROF01,Matematica,8.2,1,5.2,3,7.8,4,9.5,1
 ALUN07,PROF01,Matematica,8.0,20,7.0,5,9.0,8,8.0,5
 ALUN08,PROF01,Matematica,8.0,5,10.0,3,7.0,3,9.0,2
+ALUN04,PROF01,Matematica,8.0,1,7.0,1,6.0,4,9.0,5
