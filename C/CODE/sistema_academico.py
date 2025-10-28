@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from tkinter import messagebox
-import emoji
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk
@@ -539,7 +538,8 @@ class App(ctk.CTk):
         
         tabview.add("Lançar Notas")
         tabview.add("Consultar Alunos")
-        tabview.add("Dashboard")  # NOVA ABA
+        tabview.add("Cadastrar Aluno")  # NOVA ABA 🆕
+        tabview.add("Dashboard")
         tabview.add("Estatísticas")
 
         # Aba de Lançar Notas
@@ -548,7 +548,10 @@ class App(ctk.CTk):
         # Aba de Consultar Alunos
         self.mostrar_alunos_professor(tabview.tab("Consultar Alunos"))
         
-        # NOVA ABA: Dashboard
+        # NOVA ABA: Cadastrar Aluno 🆕
+        self.mostrar_cadastrar_aluno(tabview.tab("Cadastrar Aluno"))
+        
+        # Aba: Dashboard
         self.mostrar_dashboard_professor(tabview.tab("Dashboard"))
         
         # Aba de Estatísticas
@@ -561,7 +564,169 @@ class App(ctk.CTk):
         self.switch_frame(professor_frame)
 
     # ===============================
-    # NOVO: DASHBOARD DO PROFESSOR
+    # NOVA FUNCIONALIDADE: CADASTRAR ALUNO 🆕
+    # ===============================
+
+    def mostrar_cadastrar_aluno(self, parent):
+        """Interface para professor cadastrar novos alunos"""
+        main_frame = ctk.CTkFrame(parent)
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Título
+        title = ctk.CTkLabel(
+            main_frame,
+            text="👨‍🎓 Cadastrar Novo Aluno",
+            font=("Arial bold", 20)
+        )
+        title.pack(pady=10)
+
+        # Informação do professor
+        info_professor = ctk.CTkLabel(
+            main_frame,
+            text=f"Professor: {self.usuario_logado['nome']} | Disciplina: {self.usuario_logado['disciplina']}",
+            font=("Arial", 12),
+            text_color="blue"
+        )
+        info_professor.pack(pady=5)
+
+        # Frame do formulário
+        form_frame = ctk.CTkFrame(main_frame)
+        form_frame.pack(fill="x", pady=20, padx=50)
+
+        # Campo Nome
+        ctk.CTkLabel(form_frame, text="Nome do Aluno:", font=("Arial", 12)).pack(anchor="w", pady=(10, 5))
+        self.nome_aluno_entry = ctk.CTkEntry(
+            form_frame,
+            placeholder_text="Digite o nome do aluno",
+            width=300
+        )
+        self.nome_aluno_entry.pack(fill="x", pady=5, padx=10)
+
+        # Campo Sobrenome
+        ctk.CTkLabel(form_frame, text="Sobrenome do Aluno:", font=("Arial", 12)).pack(anchor="w", pady=(10, 5))
+        self.sobrenome_aluno_entry = ctk.CTkEntry(
+            form_frame,
+            placeholder_text="Digite o sobrenome do aluno",
+            width=300
+        )
+        self.sobrenome_aluno_entry.pack(fill="x", pady=5, padx=10)
+
+        # Informações automáticas
+        info_auto_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
+        info_auto_frame.pack(fill="x", pady=10, padx=10)
+
+        info_text = """
+        💡 Informações que serão geradas automaticamente:
+        • RA do aluno (ALUN##)
+        • Status: Ativo
+        • Tipo: Aluno
+        • Disciplina vinculada: A mesma do professor
+        """
+        
+        ctk.CTkLabel(
+            info_auto_frame,
+            text=info_text,
+            font=("Arial", 10),
+            text_color="green",
+            justify="left"
+        ).pack(anchor="w")
+
+        # Botões
+        button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
+        button_frame.pack(fill="x", pady=20)
+
+        btn_cadastrar = ctk.CTkButton(
+            button_frame,
+            text="✅ Cadastrar Aluno",
+            command=self.cadastrar_novo_aluno,
+            fg_color="#27AE60",
+            hover_color="#219955",
+            height=40
+        )
+        btn_cadastrar.pack(side="left", padx=10)
+
+        btn_limpar = ctk.CTkButton(
+            button_frame,
+            text="🔄 Limpar Campos",
+            command=self.limpar_campos_cadastro,
+            fg_color="#F39C12",
+            hover_color="#E67E22",
+            height=40
+        )
+        btn_limpar.pack(side="left", padx=10)
+
+    def cadastrar_novo_aluno(self):
+        """Cadastra um novo aluno no sistema"""
+        nome = self.nome_aluno_entry.get().strip()
+        sobrenome = self.sobrenome_aluno_entry.get().strip()
+
+        # Validações
+        if not nome or not sobrenome:
+            messagebox.showwarning("Cadastro", "Por favor, preencha nome e sobrenome!")
+            return
+
+        if len(nome) < 2 or len(sobrenome) < 2:
+            messagebox.showwarning("Cadastro", "Nome e sobrenome devem ter pelo menos 2 caracteres!")
+            return
+
+        try:
+            # Gerar RA automático (ALUN##)
+            alunos_existentes = self.df_usuarios[self.df_usuarios['Tipo'] == 1]
+            novo_numero = len(alunos_existentes) + 1
+            novo_ra = f"ALUN{novo_numero:02d}"
+
+            # Verificar se RA já existe (por segurança)
+            while novo_ra in self.df_usuarios['RA'].values:
+                novo_numero += 1
+                novo_ra = f"ALUN{novo_numero:02d}"
+
+            # Criar novo registro do aluno
+            novo_aluno = {
+                'RA': novo_ra,
+                'Nome': nome,
+                'Sobrenome': sobrenome,
+                'Tipo': 1,  # Aluno
+                'Disciplina': self.usuario_logado['disciplina'],
+                'Ativo': 1  # Aluno ativo por padrão
+            }
+
+            # Adicionar ao DataFrame
+            novo_df = pd.DataFrame([novo_aluno])
+            self.df_usuarios = pd.concat([self.df_usuarios, novo_df], ignore_index=True)
+
+            # Salvar no CSV
+            self.df_usuarios.to_csv('dados_usuarios.csv', index=False)
+
+            # Mensagem de sucesso
+            mensagem = f"""
+            ✅ Aluno cadastrado com sucesso!
+
+            📋 RA: {novo_ra}
+            🧑‍🎓 Nome: {nome} {sobrenome}
+            📚 Disciplina: {self.usuario_logado['disciplina']}
+            🟢 Status: Ativo
+
+            💡 O aluno já pode receber notas e faltas!
+            """
+            
+            messagebox.showinfo("Sucesso", mensagem)
+
+            # Limpar campos
+            self.limpar_campos_cadastro()
+
+            # Recarregar dados
+            self.carregar_dados()
+
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao cadastrar aluno: {e}")
+
+    def limpar_campos_cadastro(self):
+        """Limpa os campos do formulário de cadastro"""
+        self.nome_aluno_entry.delete(0, 'end')
+        self.sobrenome_aluno_entry.delete(0, 'end')
+
+    # ===============================
+    # DASHBOARD DO PROFESSOR
     # ===============================
 
     def mostrar_dashboard_professor(self, parent):

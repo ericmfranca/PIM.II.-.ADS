@@ -289,6 +289,24 @@ void listarAlunos() {
     }
 }
 
+// Listar alunos inativos - NOVA FUNCAO
+void listarAlunosInativos() {
+    printf("\n=== LISTA DE ALUNOS INATIVOS ===\n");
+    int encontrou = 0;
+    for (int i = 0; i < totalUsuarios; i++) {
+        if (usuarios[i].tipo == 1 && usuarios[i].ativo == 0) { // Apenas alunos inativos
+            printf("RA: %s | Nome: %s %s | Status: INATIVO\n",
+                   usuarios[i].ra, 
+                   usuarios[i].nome, 
+                   usuarios[i].sobrenome);
+            encontrou = 1;
+        }
+    }
+    if (!encontrou) {
+        printf("Nenhum aluno inativo encontrado.\n");
+    }
+}
+
 // Listar todos os alunos (incluindo inativos) - NOVA FUNCAO
 void listarTodosAlunos() {
     printf("\n=== LISTA COMPLETA DE ALUNOS ===\n");
@@ -805,7 +823,7 @@ void cadastrarAdmin() {
 // MENUS
 // ===============================
 
-// Menu do Professor - MODIFICADA: opcao de desativar aluno adicionada
+// Menu do Professor - MODIFICADA: opcao de listar alunos inativos adicionada
 void menuProfessor() {
     int opcao;
 
@@ -814,8 +832,9 @@ void menuProfessor() {
         printf("1. Lancar notas e faltas\n");
         printf("2. Consultar notas e faltas\n");
         printf("3. Listar alunos ativos\n");
-        printf("4. Desativar aluno\n"); // NOVA OPCAO
-        printf("5. Listar todos os alunos (ativos e inativos)\n"); // NOVA OPCAO
+        printf("4. Listar alunos inativos\n"); // NOVA OPCAO
+        printf("5. Desativar aluno\n");
+        printf("6. Listar todos os alunos (ativos e inativos)\n");
         printf("0. Voltar\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
@@ -825,17 +844,18 @@ void menuProfessor() {
             case 1: lancarNotasFaltas(); break;
             case 2: consultarNotasFaltas(); break;
             case 3: listarAlunos(); break;
-            case 4: desativarAluno(); break; // NOVA OPCAO
-            case 5: listarTodosAlunos(); break; // NOVA OPCAO
+            case 4: listarAlunosInativos(); break; // NOVA OPCAO
+            case 5: desativarAluno(); break;
+            case 6: listarTodosAlunos(); break;
             case 0: printf("Voltando...\n"); break;
             default: printf("Opcao invalida!\n");
         }
     } while (opcao != 0);
 }
 
-// Menu do Admin (PROTEGIDO POR SENHA) - MODIFICADA: opcoes de remocao adicionadas
+// Menu do Admin (PROTEGIDO POR SENHA) - MODIFICADA: opcoes completas de gerenciamento de alunos
 void menuAdmin() {
-    // Verificar senha primeiro
+    // Verifica senha primeiro
     if (!verificarSenhaAdmin()) {
         printf("Acesso ao menu administrativo negado.\n");
         return;
@@ -848,11 +868,13 @@ void menuAdmin() {
         printf("1. Cadastrar Professor\n");
         printf("2. Cadastrar Administrador\n");
         printf("3. Listar alunos ativos\n");
-        printf("4. Listar professores\n");
-        printf("5. Listar administradores\n"); // NOVA OPCAO
-        printf("6. Remover professor/administrador\n"); // NOVA OPCAO
-        printf("7. Listar todos os alunos (ativos e inativos)\n"); // NOVA OPCAO
-        printf("8. Reativar aluno\n"); // NOVA OPCAO
+        printf("4. Listar alunos inativos\n"); // NOVA OPCAO
+        printf("5. Listar professores\n");
+        printf("6. Listar administradores\n");
+        printf("7. Remover professor/administrador\n");
+        printf("8. Listar todos os alunos (ativos e inativos)\n");
+        printf("9. Desativar aluno\n"); // NOVA OPCAO
+        printf("10. Reativar aluno\n");
         printf("0. Voltar\n");
         printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
@@ -862,11 +884,13 @@ void menuAdmin() {
             case 1: cadastrarProfessor(); break;
             case 2: cadastrarAdmin(); break;
             case 3: listarAlunos(); break;
-            case 4: listarProfessores(); break;
-            case 5: listarAdministradores(); break; // NOVA OPCAO
-            case 6: removerUsuario(); break; // NOVA OPCAO
-            case 7: listarTodosAlunos(); break; // NOVA OPCAO
-            case 8: reativarAluno(); break; // NOVA OPCAO
+            case 4: listarAlunosInativos(); break; // NOVA OPCAO
+            case 5: listarProfessores(); break;
+            case 6: listarAdministradores(); break;
+            case 7: removerUsuario(); break;
+            case 8: listarTodosAlunos(); break;
+            case 9: desativarAluno(); break; // NOVA OPCAO
+            case 10: reativarAluno(); break;
             case 0: printf("Voltando ao menu principal...\n"); break;
             default: printf("Opcao invalida!\n");
         }
