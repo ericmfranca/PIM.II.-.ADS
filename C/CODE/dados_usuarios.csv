@@ -3,13 +3,15 @@ ALUN01,Eric,Franca,1,1,0
 ALUN02,Eric,Franca,1,1,1
 ALUN03,Lais,Franca,1,1,1
 PROF01,Simoes,Santos,2,Matematica,1
-ADM001,Paulo,Admin,3,,1
+ADM001,Paulo,Admin,3,1,1
 ALUN04,Kevin,Barbosa,1,1,1
 PROF02,Pedro,Americo,2,Portugues,1
 ALUN05,Lais,Franca,1,1,1
 PROF03,Derci,Silva,2,Ciencias,1
 ALUN06,Enzo,Franca,1,1,1
 ALUN07,Pedro,Conceicao,1,1,1
-ALUN08,mari,lima,1,1,1
+ALUN08,Mari,Lima,1,1,1
 PROF04,Egidio,UML,2,Portugues,1
 ALUN09,Paulo,Marton,1,Matematica,1
+ALUN10,Luis,Affonso,1,Matematica,1
+ALUN11,Yasmin,Astah,1,Matematica,1
