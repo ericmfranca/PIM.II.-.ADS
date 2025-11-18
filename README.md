@@ -36,6 +36,16 @@ O **SiGA** é um sistema colaborativo para gestão acadêmica, desenvolvido com 
 - Arquivos CSV para armazenamento de dados.
 
 ---
+## 👥 Equipe
+
+Eric Moraes de Franca
+Kevin Vieira Barbosa
+Maria Eduarda de Lima
+Pedro Augusto F B da Conceição
+Samuel Negreiros Ferreira
+Yasmin Marques Juc
+
+---
 
 ## ▶️ Como Executar
 1. Clone o repositório:
