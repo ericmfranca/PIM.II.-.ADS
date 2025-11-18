@@ -38,12 +38,12 @@ O **SiGA** é um sistema colaborativo para gestão acadêmica, desenvolvido com 
 ---
 ## 👥 Equipe
 
-Eric Moraes de Franca
-Kevin Vieira Barbosa
-Maria Eduarda de Lima
-Pedro Augusto F B da Conceição
-Samuel Negreiros Ferreira
-Yasmin Marques Juc
+- Eric Moraes de Franca.
+- Kevin Vieira Barbosa.
+- Maria Eduarda de Lima.
+- Pedro Augusto F B da Conceição.
+- Samuel Negreiros Ferreira.
+- Yasmin Marques Juc.
 
 ---
 
