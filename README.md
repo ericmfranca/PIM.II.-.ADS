@@ -39,7 +39,7 @@ O **SiGA** é um sistema colaborativo para gestão acadêmica, desenvolvido com 
 ## 👥 Equipe
 
 - [Eric Moraes de Franca](https://www.linkedin.com/in/eric-mfranca/).
-- Kevin Vieira Barbosa.
+- [Kevin Vieira Barbosa](https://www.linkedin.com/in/kvbarbosa?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app).
 - [Maria Eduarda de Lima](https://www.linkedin.com/in/maria-eduarda-lima-30b493332/).
 - Pedro Augusto F B da Conceição.
 - Samuel Negreiros Ferreira.
