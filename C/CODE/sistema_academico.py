@@ -310,8 +310,8 @@ class App(ctk.CTk):
         # CORREÇÃO 3: Bind Enter key
         self.ra_entry.bind("<Return>", lambda event: self.login())
 
-        ctk.CTkLabel(input_frame, text="Senha (Sobrenome):", font=("Arial", 12)).grid(row=1, column=0, sticky="w", pady=5)
-        self.senha_entry = ctk.CTkEntry(input_frame, placeholder_text="Digite seu sobrenome", show="*", width=250)
+        ctk.CTkLabel(input_frame, text="Senha (Senha):", font=("Arial", 12)).grid(row=1, column=0, sticky="w", pady=5)
+        self.senha_entry = ctk.CTkEntry(input_frame, placeholder_text="Senha", show="*", width=250)
         self.senha_entry.grid(row=1, column=1, padx=10, pady=5)
         # CORREÇÃO 3: Bind Enter key
         self.senha_entry.bind("<Return>", lambda event: self.login())
@@ -323,16 +323,93 @@ class App(ctk.CTk):
         login_button = ctk.CTkButton(button_frame, text="Entrar", command=self.login, width=120)
         login_button.pack(pady=10)
 
-        # Informações de login
-        info_text = ctk.CTkLabel(login_frame, 
-                                text="💡 Dicas de login:\n"
-                                     "Aluno: ALUN## + Sobrenome\n"
-                                     "Professor: PROF## + Sobrenome\n" 
-                                     "Admin: ADM### + Sobrenome",
-                                font=("Arial", 11),
-                                text_color="gray",
-                                justify="left")
-        info_text.pack(pady=20)
+        # ===============================
+        # NOVO: FAQ COM ABAS 🆕
+        # ===============================
+        
+        # Frame do FAQ
+        faq_frame = ctk.CTkFrame(login_frame, border_width=1, border_color="#3498DB")
+        faq_frame.pack(fill="x", padx=40, pady=(10, 20))
+        
+        # Título do FAQ
+        faq_title = ctk.CTkLabel(
+            faq_frame, 
+            text="📚 Guia de Acesso - Tipos de Usuário",
+            font=("Arial bold", 14),
+            text_color="#000000"
+        )
+        faq_title.pack(pady=10)
+        
+        # Abas para cada tipo de usuário
+        faq_tabview = ctk.CTkTabview(faq_frame, width=500, height=200)
+        faq_tabview.pack(padx=10, pady=(0, 10))
+        
+        # Aba do Aluno
+        faq_tabview.add("👨‍🎓 Aluno")
+        aluno_content = """
+        **COMO ACESSAR:**
+        • RA: ALUN## (ex: ALUN01, ALUN15)
+        • Senha: Seu sobrenome
+        
+        **FUNCIONALIDADES DISPONÍVEIS:**
+        ✅ Consultar suas notas e faltas
+        ✅ Ver médias por disciplina
+        ✅ Verificar situação acadêmica
+        ✅ Visualizar dados pessoais
+        
+        **EXEMPLO DE LOGIN:**
+        RA: ALUN03
+        Senha: silva
+        """
+        ctk.CTkLabel(faq_tabview.tab("👨‍🎓 Aluno"), 
+                    text=aluno_content, 
+                    font=("Arial", 10),
+                    justify="left").pack(padx=10, pady=10)
+        
+        # Aba do Professor
+        faq_tabview.add("👨‍🏫 Professor")
+        professor_content = """
+        **COMO ACESSAR:**
+        • RA: PROF## (ex: PROF01, PROF05)
+        • Senha: Seu sobrenome
+        
+        **FUNCIONALIDADES DISPONÍVEIS:**
+        ✅ Lançar notas e faltas dos alunos
+        ✅ Consultar todos os alunos
+        ✅ Cadastrar novos alunos
+        ✅ Dashboard com gráficos e estatísticas
+        ✅ Ver detalhes completos dos alunos
+        
+        **EXEMPLO DE LOGIN:**
+        RA: PROF02
+        Senha: santos
+        """
+        ctk.CTkLabel(faq_tabview.tab("👨‍🏫 Professor"), 
+                    text=professor_content, 
+                    font=("Arial", 10),
+                    justify="left").pack(padx=10, pady=10)
+        
+        # Aba do Administrador
+        faq_tabview.add("👨‍💼 Admin")
+        admin_content = """
+        **COMO ACESSAR:**
+        • RA: ADM### (ex: ADM001, ADM010)
+        • Senha: Seu sobrenome
+        
+        **FUNCIONALIDADES DISPONÍVEIS:**
+        ✅ Visualizar estatísticas gerais do sistema
+        ✅ Ver todos os usuários cadastrados
+        ✅ Gerenciar o sistema completo
+        ✅ Acessar todos os registros
+        
+        **EXEMPLO DE LOGIN:**
+        RA: ADM001
+        Senha: admin
+        """
+        ctk.CTkLabel(faq_tabview.tab("👨‍💼 Admin"), 
+                    text=admin_content, 
+                    font=("Arial", 10),
+                    justify="left").pack(padx=10, pady=10)
 
         self.switch_frame(login_frame)
 

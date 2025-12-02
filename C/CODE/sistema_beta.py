@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from tkinter import messagebox
-import emoji
 import pandas as pd
 import tkinter as tk
 from tkinter import ttk
@@ -261,6 +260,7 @@ class App(ctk.CTk):
 
         self.title("Sistema de Gestão Acadêmica (SiGA)")
         self.geometry("800x600")
+        self.resizable(True, True)  # Permitir redimensionamento
         
         # Carregar dados do CSV
         self.carregar_dados()
@@ -270,6 +270,8 @@ class App(ctk.CTk):
         
         # Variáveis do sistema
         self.usuario_logado = None
+        self.faq_visible = False  # Controle do FAQ visível
+        self.faq_window = None  # Referência para janela do FAQ
 
         # Exibir a tela de login primeiro
         self.current_frame = None
@@ -295,47 +297,329 @@ class App(ctk.CTk):
     def show_login_frame(self):
         login_frame = ctk.CTkFrame(self)
         
-        title = ctk.CTkLabel(login_frame, text="Sistema de Gestão Acadêmica (SiGA)", font=("Arial bold", 30))
-        title.pack(pady=20)
+        # Container principal para centralizar conteúdo
+        main_container = ctk.CTkFrame(login_frame, fg_color="transparent")
+        main_container.pack(expand=True, fill="both", padx=40, pady=40)
+        
+        # Frame para título (topo)
+        title_frame = ctk.CTkFrame(main_container, fg_color="transparent")
+        title_frame.pack(pady=(0, 30))
+        
+        title = ctk.CTkLabel(title_frame, 
+                            text="Sistema de Gestão Acadêmica (SiGA)", 
+                            font=("Arial bold", 28))
+        title.pack()
+        
+        subtitle = ctk.CTkLabel(title_frame, 
+                               text="Login de Acesso", 
+                               font=("Arial", 16), 
+                               text_color="gray")
+        subtitle.pack(pady=(5, 0))
 
-        subtitle = ctk.CTkLabel(login_frame, text="Login de Acesso", font=("Arial", 14), text_color="gray")
-        subtitle.pack(pady=(0, 20))
-
-        # Frame para campos de entrada
-        input_frame = ctk.CTkFrame(login_frame, fg_color="transparent")
-        input_frame.pack(pady=20)
-
-        ctk.CTkLabel(input_frame, text="RA:", font=("Arial", 12)).grid(row=0, column=0, sticky="w", pady=5)
-        self.ra_entry = ctk.CTkEntry(input_frame, placeholder_text="Digite seu RA", width=250)
-        self.ra_entry.grid(row=0, column=1, padx=10, pady=5)
-        # CORREÇÃO 3: Bind Enter key
+        # Frame para formulário (centro)
+        form_frame = ctk.CTkFrame(main_container, fg_color="transparent")
+        form_frame.pack(expand=True)
+        
+        # Container interno para campos
+        input_container = ctk.CTkFrame(form_frame, fg_color="transparent")
+        input_container.pack(pady=20)
+        
+        # Campo RA
+        ra_label = ctk.CTkLabel(input_container, 
+                               text="RA:", 
+                               font=("Arial", 14, "bold"),
+                               width=120,
+                               anchor="w")
+        ra_label.grid(row=0, column=0, sticky="w", pady=10, padx=(0, 10))
+        
+        self.ra_entry = ctk.CTkEntry(input_container, 
+                                    placeholder_text="Digite seu RA (ex: ALUN01, PROF02)",
+                                    width=300,
+                                    height=40,
+                                    font=("Arial", 13))
+        self.ra_entry.grid(row=0, column=1, pady=10)
         self.ra_entry.bind("<Return>", lambda event: self.login())
 
-        ctk.CTkLabel(input_frame, text="Senha (Sobrenome):", font=("Arial", 12)).grid(row=1, column=0, sticky="w", pady=5)
-        self.senha_entry = ctk.CTkEntry(input_frame, placeholder_text="Digite seu sobrenome", show="*", width=250)
-        self.senha_entry.grid(row=1, column=1, padx=10, pady=5)
-        # CORREÇÃO 3: Bind Enter key
+        # Campo Senha
+        senha_label = ctk.CTkLabel(input_container, 
+                                  text="Senha (Sobrenome):", 
+                                  font=("Arial", 14, "bold"),
+                                  width=120,
+                                  anchor="w")
+        senha_label.grid(row=1, column=0, sticky="w", pady=10, padx=(0, 10))
+        
+        self.senha_entry = ctk.CTkEntry(input_container, 
+                                       placeholder_text="Digite seu sobrenome",
+                                       show="*", 
+                                       width=300,
+                                       height=40,
+                                       font=("Arial", 13))
+        self.senha_entry.grid(row=1, column=1, pady=10)
         self.senha_entry.bind("<Return>", lambda event: self.login())
 
-        # Frame para botões
-        button_frame = ctk.CTkFrame(login_frame, fg_color="transparent")
-        button_frame.pack(pady=20)
+        # Frame para botão de login (embaixo dos campos)
+        button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
+        button_frame.pack(pady=30)
+        
+        login_button = ctk.CTkButton(button_frame, 
+                                    text="Entrar no Sistema", 
+                                    command=self.login, 
+                                    width=200,
+                                    height=45,
+                                    font=("Arial bold", 15),
+                                    fg_color="#3498DB",
+                                    hover_color="#2980B9")
+        login_button.pack()
 
-        login_button = ctk.CTkButton(button_frame, text="Entrar", command=self.login, width=120)
-        login_button.pack(pady=10)
-
-        # Informações de login
-        info_text = ctk.CTkLabel(login_frame, 
-                                text="💡 Dicas de login:\n"
-                                     "Aluno: ALUN## + Sobrenome\n"
-                                     "Professor: PROF## + Sobrenome\n" 
-                                     "Admin: ADM### + Sobrenome",
+        # Frame para mensagem informativa
+        info_frame = ctk.CTkFrame(main_container, fg_color="transparent")
+        info_frame.pack(pady=(10, 0))
+        
+        info_text = ctk.CTkLabel(info_frame,
+                                text="💡 Dica: Use o botão de ajuda no canto inferior direito para mais informações",
                                 font=("Arial", 11),
-                                text_color="gray",
-                                justify="left")
-        info_text.pack(pady=20)
+                                text_color="gray")
+        info_text.pack()
+
+        # ===============================
+        # BOTÕES FLUTUANTES PARA FAQ
+        # ===============================
+        
+        # Container para os botões flutuantes (fixo no canto inferior direito)
+        self.faq_buttons_container = ctk.CTkFrame(login_frame, 
+                                                 fg_color="transparent",
+                                                 width=80, 
+                                                 height=80)
+        self.faq_buttons_container.place(relx=1.0, rely=1.0, anchor="se", x=-20, y=-20)
+        
+        # Botão principal flutuante para FAQ
+        self.faq_main_button = ctk.CTkButton(
+            self.faq_buttons_container,
+            text="❓",
+            width=60,
+            height=60,
+            font=("Arial bold", 20),
+            command=self.toggle_faq_buttons,
+            fg_color="#3498DB",
+            hover_color="#2980B9",
+            corner_radius=30,
+            border_width=2,
+            border_color="#ffffff"
+        )
+        self.faq_main_button.pack()
+        
+        # Container para botões secundários (inicialmente oculto)
+        self.faq_secondary_buttons = ctk.CTkFrame(self.faq_buttons_container, 
+                                                 fg_color="transparent")
+        
+        # Botão para Aluno
+        self.faq_aluno_button = ctk.CTkButton(
+            self.faq_secondary_buttons,
+            text="👨‍🎓 Aluno",
+            width=120,
+            height=40,
+            font=("Arial", 12),
+            command=lambda: self.show_faq_detail("aluno"),
+            fg_color="#2ECC71",
+            hover_color="#27AE60",
+            corner_radius=8
+        )
+        self.faq_aluno_button.pack(pady=5)
+        
+        # Botão para Professor
+        self.faq_professor_button = ctk.CTkButton(
+            self.faq_secondary_buttons,
+            text="👨‍🏫 Professor",
+            width=120,
+            height=40,
+            font=("Arial", 12),
+            command=lambda: self.show_faq_detail("professor"),
+            fg_color="#E74C3C",
+            hover_color="#C0392B",
+            corner_radius=8
+        )
+        self.faq_professor_button.pack(pady=5)
+        
+        # Botão para Admin
+        self.faq_admin_button = ctk.CTkButton(
+            self.faq_secondary_buttons,
+            text="👨‍💼 Admin",
+            width=120,
+            height=40,
+            font=("Arial", 12),
+            command=lambda: self.show_faq_detail("admin"),
+            fg_color="#F39C12",
+            hover_color="#E67E22",
+            corner_radius=8
+        )
+        self.faq_admin_button.pack(pady=5)
+        
+        # Botão para fechar FAQ
+        self.faq_close_button = ctk.CTkButton(
+            self.faq_secondary_buttons,
+            text="✕ Fechar",
+            width=120,
+            height=35,
+            font=("Arial", 11),
+            command=self.toggle_faq_buttons,
+            fg_color="#95A5A6",
+            hover_color="#7F8C8D",
+            corner_radius=8
+        )
+        self.faq_close_button.pack(pady=5)
 
         self.switch_frame(login_frame)
+
+    def toggle_faq_buttons(self):
+        """Alterna a visibilidade dos botões do FAQ"""
+        if self.faq_visible:
+            # Esconder botões secundários
+            self.faq_secondary_buttons.place_forget()
+            self.faq_main_button.configure(text="❓")
+        else:
+            # Mostrar botões secundários acima do botão principal
+            self.faq_secondary_buttons.place(relx=0.5, rely=0, anchor="s", y=-10)
+            self.faq_main_button.configure(text="▼")
+        
+        self.faq_visible = not self.faq_visible
+
+    def show_faq_detail(self, tipo):
+        """Mostra detalhes do FAQ para o tipo selecionado"""
+        # Fechar janela anterior se existir
+        if self.faq_window is not None:
+            self.faq_window.destroy()
+        
+        # Criar nova janela
+        self.faq_window = ctk.CTkToplevel(self)
+        self.faq_window.title(f"Ajuda - {tipo.capitalize()}")
+        self.faq_window.geometry("500x500")
+        self.faq_window.transient(self)
+        self.faq_window.grab_set()
+        
+        # Centralizar janela
+        self.faq_window.update_idletasks()
+        width = self.faq_window.winfo_width()
+        height = self.faq_window.winfo_height()
+        x = (self.faq_window.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.faq_window.winfo_screenheight() // 2) - (height // 2)
+        self.faq_window.geometry(f'{width}x{height}+{x}+{y}')
+        
+        # Configurar detalhes com base no tipo
+        if tipo == "aluno":
+            title = "👨‍🎓 Guia do Aluno"
+            content = """
+            **COMO ACESSAR:**
+            • RA: ALUN## (ex: ALUN01, ALUN15)
+            • Senha: Seu sobrenome
+            
+            **FUNCIONALIDADES DISPONÍVEIS:**
+            ✅ Consultar suas notas e faltas
+            ✅ Ver médias por disciplina
+            ✅ Verificar situação acadêmica
+            ✅ Visualizar dados pessoais
+            
+            **EXEMPLO DE LOGIN:**
+            RA: ALUN03
+            Senha: silva
+            
+            **DICAS:**
+            • Sua senha é seu sobrenome (minúsculas)
+            • Verifique suas faltas regularmente
+            • Notas abaixo de 6.0 = Reprovado
+            """
+            
+        elif tipo == "professor":
+            title = "👨‍🏫 Guia do Professor"
+            content = """
+            **COMO ACESSAR:**
+            • RA: PROF## (ex: PROF01, PROF05)
+            • Senha: Seu sobrenome
+            
+            **FUNCIONALIDADES DISPONÍVEIS:**
+            ✅ Lançar notas e faltas dos alunos
+            ✅ Consultar todos os alunos
+            ✅ Cadastrar novos alunos
+            ✅ Dashboard com gráficos e estatísticas
+            ✅ Ver detalhes completos dos alunos
+            
+            **EXEMPLO DE LOGIN:**
+            RA: PROF02
+            Senha: santos
+            
+            **LIMITES IMPORTANTES:**
+            • Notas: 0 a 10
+            • Faltas máximas por bimestre: 35 (70% de 50 aulas)
+            """
+            
+        else:  # admin
+            title = "👨‍💼 Guia do Administrador"
+            content = """
+            **COMO ACESSAR:**
+            • RA: ADM### (ex: ADM001, ADM010)
+            • Senha: Seu sobrenome
+            
+            **FUNCIONALIDADES DISPONÍVEIS:**
+            ✅ Visualizar estatísticas gerais do sistema
+            ✅ Ver todos os usuários cadastrados
+            ✅ Gerenciar o sistema completo
+            ✅ Acessar todos os registros
+            
+            **EXEMPLO DE LOGIN:**
+            RA: ADM001
+            Senha: admin
+            
+            **PRIVILÉGIOS:**
+            • Acesso total ao sistema
+            • Visualização de todos os dados
+            • Sem restrições de funcionalidades
+            """
+        
+        # Frame principal
+        main_frame = ctk.CTkFrame(self.faq_window)
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+        
+        # Título
+        title_label = ctk.CTkLabel(
+            main_frame,
+            text=title,
+            font=("Arial bold", 18),
+            text_color="#2C3E50"
+        )
+        title_label.pack(pady=(10, 20))
+        
+        # Frame com scroll para conteúdo
+        scroll_frame = ctk.CTkScrollableFrame(main_frame)
+        scroll_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        
+        # Conteúdo
+        content_label = ctk.CTkLabel(
+            scroll_frame,
+            text=content,
+            font=("Arial", 12),
+            justify="left",
+            wraplength=400
+        )
+        content_label.pack(expand=True, fill="both")
+        
+        # Botão fechar
+        close_button = ctk.CTkButton(
+            main_frame,
+            text="Fechar",
+            command=self.faq_window.destroy,
+            width=100,
+            height=35,
+            font=("Arial", 12),
+            fg_color="#3498DB",
+            hover_color="#2980B9"
+        )
+        close_button.pack(pady=20)
+        
+        # Configurar comportamento ao fechar
+        def on_closing():
+            self.faq_window.destroy()
+            self.faq_window = None
+        
+        self.faq_window.protocol("WM_DELETE_WINDOW", on_closing)
 
     def login(self):
         ra = self.ra_entry.get().strip().upper()
@@ -539,7 +823,8 @@ class App(ctk.CTk):
         
         tabview.add("Lançar Notas")
         tabview.add("Consultar Alunos")
-        tabview.add("Dashboard")  # NOVA ABA
+        tabview.add("Cadastrar Aluno")  # NOVA ABA 🆕
+        tabview.add("Dashboard")
         tabview.add("Estatísticas")
 
         # Aba de Lançar Notas
@@ -548,7 +833,10 @@ class App(ctk.CTk):
         # Aba de Consultar Alunos
         self.mostrar_alunos_professor(tabview.tab("Consultar Alunos"))
         
-        # NOVA ABA: Dashboard
+        # NOVA ABA: Cadastrar Aluno 🆕
+        self.mostrar_cadastrar_aluno(tabview.tab("Cadastrar Aluno"))
+        
+        # Aba: Dashboard
         self.mostrar_dashboard_professor(tabview.tab("Dashboard"))
         
         # Aba de Estatísticas
@@ -561,7 +849,169 @@ class App(ctk.CTk):
         self.switch_frame(professor_frame)
 
     # ===============================
-    # NOVO: DASHBOARD DO PROFESSOR
+    # NOVA FUNCIONALIDADE: CADASTRAR ALUNO 🆕
+    # ===============================
+
+    def mostrar_cadastrar_aluno(self, parent):
+        """Interface para professor cadastrar novos alunos"""
+        main_frame = ctk.CTkFrame(parent)
+        main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+        # Título
+        title = ctk.CTkLabel(
+            main_frame,
+            text="👨‍🎓 Cadastrar Novo Aluno",
+            font=("Arial bold", 20)
+        )
+        title.pack(pady=10)
+
+        # Informação do professor
+        info_professor = ctk.CTkLabel(
+            main_frame,
+            text=f"Professor: {self.usuario_logado['nome']} | Disciplina: {self.usuario_logado['disciplina']}",
+            font=("Arial", 12),
+            text_color="blue"
+        )
+        info_professor.pack(pady=5)
+
+        # Frame do formulário
+        form_frame = ctk.CTkFrame(main_frame)
+        form_frame.pack(fill="x", pady=20, padx=50)
+
+        # Campo Nome
+        ctk.CTkLabel(form_frame, text="Nome do Aluno:", font=("Arial", 12)).pack(anchor="w", pady=(10, 5))
+        self.nome_aluno_entry = ctk.CTkEntry(
+            form_frame,
+            placeholder_text="Digite o nome do aluno",
+            width=300
+        )
+        self.nome_aluno_entry.pack(fill="x", pady=5, padx=10)
+
+        # Campo Sobrenome
+        ctk.CTkLabel(form_frame, text="Sobrenome do Aluno:", font=("Arial", 12)).pack(anchor="w", pady=(10, 5))
+        self.sobrenome_aluno_entry = ctk.CTkEntry(
+            form_frame,
+            placeholder_text="Digite o sobrenome do aluno",
+            width=300
+        )
+        self.sobrenome_aluno_entry.pack(fill="x", pady=5, padx=10)
+
+        # Informações automáticas
+        info_auto_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
+        info_auto_frame.pack(fill="x", pady=10, padx=10)
+
+        info_text = """
+        💡 Informações que serão geradas automaticamente:
+        • RA do aluno (ALUN##)
+        • Status: Ativo
+        • Tipo: Aluno
+        • Disciplina vinculada: A mesma do professor
+        """
+        
+        ctk.CTkLabel(
+            info_auto_frame,
+            text=info_text,
+            font=("Arial", 10),
+            text_color="green",
+            justify="left"
+        ).pack(anchor="w")
+
+        # Botões
+        button_frame = ctk.CTkFrame(form_frame, fg_color="transparent")
+        button_frame.pack(fill="x", pady=20)
+
+        btn_cadastrar = ctk.CTkButton(
+            button_frame,
+            text="✅ Cadastrar Aluno",
+            command=self.cadastrar_novo_aluno,
+            fg_color="#27AE60",
+            hover_color="#219955",
+            height=40
+        )
+        btn_cadastrar.pack(side="left", padx=10)
+
+        btn_limpar = ctk.CTkButton(
+            button_frame,
+            text="🔄 Limpar Campos",
+            command=self.limpar_campos_cadastro,
+            fg_color="#F39C12",
+            hover_color="#E67E22",
+            height=40
+        )
+        btn_limpar.pack(side="left", padx=10)
+
+    def cadastrar_novo_aluno(self):
+        """Cadastra um novo aluno no sistema"""
+        nome = self.nome_aluno_entry.get().strip()
+        sobrenome = self.sobrenome_aluno_entry.get().strip()
+
+        # Validações
+        if not nome or not sobrenome:
+            messagebox.showwarning("Cadastro", "Por favor, preencha nome e sobrenome!")
+            return
+
+        if len(nome) < 2 or len(sobrenome) < 2:
+            messagebox.showwarning("Cadastro", "Nome e sobrenome devem ter pelo menos 2 caracteres!")
+            return
+
+        try:
+            # Gerar RA automático (ALUN##)
+            alunos_existentes = self.df_usuarios[self.df_usuarios['Tipo'] == 1]
+            novo_numero = len(alunos_existentes) + 1
+            novo_ra = f"ALUN{novo_numero:02d}"
+
+            # Verificar se RA já existe (por segurança)
+            while novo_ra in self.df_usuarios['RA'].values:
+                novo_numero += 1
+                novo_ra = f"ALUN{novo_numero:02d}"
+
+            # Criar novo registro do aluno
+            novo_aluno = {
+                'RA': novo_ra,
+                'Nome': nome,
+                'Sobrenome': sobrenome,
+                'Tipo': 1,  # Aluno
+                'Disciplina': self.usuario_logado['disciplina'],
+                'Ativo': 1  # Aluno ativo por padrão
+            }
+
+            # Adicionar ao DataFrame
+            novo_df = pd.DataFrame([novo_aluno])
+            self.df_usuarios = pd.concat([self.df_usuarios, novo_df], ignore_index=True)
+
+            # Salvar no CSV
+            self.df_usuarios.to_csv('dados_usuarios.csv', index=False)
+
+            # Mensagem de sucesso
+            mensagem = f"""
+            ✅ Aluno cadastrado com sucesso!
+
+            📋 RA: {novo_ra}
+            🧑‍🎓 Nome: {nome} {sobrenome}
+            📚 Disciplina: {self.usuario_logado['disciplina']}
+            🟢 Status: Ativo
+
+            💡 O aluno já pode receber notas e faltas!
+            """
+            
+            messagebox.showinfo("Sucesso", mensagem)
+
+            # Limpar campos
+            self.limpar_campos_cadastro()
+
+            # Recarregar dados
+            self.carregar_dados()
+
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao cadastrar aluno: {e}")
+
+    def limpar_campos_cadastro(self):
+        """Limpa os campos do formulário de cadastro"""
+        self.nome_aluno_entry.delete(0, 'end')
+        self.sobrenome_aluno_entry.delete(0, 'end')
+
+    # ===============================
+    # DASHBOARD DO PROFESSOR
     # ===============================
 
     def mostrar_dashboard_professor(self, parent):
@@ -815,7 +1265,6 @@ class App(ctk.CTk):
                 command=lambda ra=aluno['ra']: self.abrir_lancamento_aluno(ra),
                 fg_color="transparent",
                 hover_color="#2B2B2B" if ctk.get_appearance_mode() == "Dark" else "#F0F0F0",
-                # CORREÇÃO 1: Text color adaptativo + alinhamento à esquerda
                 text_color=("black", "white"),  # (light theme, dark theme)
                 anchor="w"  # Alinhamento à esquerda
             )
@@ -936,7 +1385,7 @@ class App(ctk.CTk):
             notas = []
             faltas = []
             
-            # NOVO: Definir total de aulas por bimestre (valor fixo)
+            # Definir total de aulas por bimestre (valor fixo)
             TOTAL_AULAS_BIMESTRE = 50
             LIMITE_FALTAS = TOTAL_AULAS_BIMESTRE * 0.7  # 70% do total
             
@@ -960,14 +1409,14 @@ class App(ctk.CTk):
                 else:
                     notas.append(None)
                 
-                # Validar faltas - COM NOVA VALIDAÇÃO DE 70%
+                # Validar faltas
                 if faltas_text:
                     falta = int(faltas_text)
                     if falta < 0:
                         messagebox.showerror("Erro", f"Faltas do bimestre {i+1} não podem ser negativas!")
                         return
                     
-                    # NOVA VALIDAÇÃO: Verificar se faltas não ultrapassam 70% do total de aulas
+                    # Verificar se faltas não ultrapassam 70% do total de aulas
                     if falta > LIMITE_FALTAS:
                         messagebox.showerror(
                             "Erro", 
@@ -1043,7 +1492,7 @@ class App(ctk.CTk):
     # ===============================
 
     def mostrar_alunos_professor(self, parent):
-        """Mostra alunos para o professor - CORREÇÃO 2: Adicionado campo de pesquisa"""
+        """Mostra alunos para o professor"""
         # Frame de pesquisa
         search_frame = ctk.CTkFrame(parent)
         search_frame.pack(fill="x", pady=10, padx=10)
@@ -1103,7 +1552,7 @@ class App(ctk.CTk):
         self.mostrar_alunos_consulta(alunos_filtrados)
 
     def mostrar_alunos_consulta(self, alunos):
-        """Mostra a lista de alunos na consulta - NOVA FUNCIONALIDADE: Botões clicáveis"""
+        """Mostra a lista de alunos na consulta"""
         # Limpar frame atual
         for widget in self.scroll_consultar_frame.winfo_children():
             widget.destroy()
@@ -1154,7 +1603,7 @@ class App(ctk.CTk):
         ctk.CTkLabel(total_frame, text=f"Total de alunos: {len(alunos)}", font=("Arial", 12)).pack()
 
     def abrir_detalhes_aluno(self, ra_aluno):
-        """NOVA FUNCIONALIDADE: Abre janela com detalhes completos do aluno"""
+        """Abre janela com detalhes completos do aluno"""
         # Buscar informações do aluno
         aluno_info = None
         for aluno in self.lista_consulta_completa:
@@ -1410,6 +1859,10 @@ class App(ctk.CTk):
 
     def logout(self):
         self.usuario_logado = None
+        self.faq_visible = False  # Resetar estado do FAQ
+        if self.faq_window is not None:
+            self.faq_window.destroy()
+            self.faq_window = None
         messagebox.showinfo("Logout", "Você saiu do sistema!")
         self.show_login_frame()
 
