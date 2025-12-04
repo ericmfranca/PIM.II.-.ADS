@@ -905,7 +905,7 @@ void menuPrincipal() {
     carregarNotasCSV();
 
     do {
-        printf("\n=== SISTEMA ACADEMICO ===\n");
+        printf("\n=== Sistema de Gestão Academica (SiGA) ===\n");
         printf("1. Cadastrar Aluno\n");
         printf("2. Menu Professor\n");
         printf("3. Menu Administrador\n");
